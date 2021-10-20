@@ -1,4 +1,10 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
+import { StudentsMiddleware } from 'src/middleware/students.middleware';
 import { StudentsController } from './students.controller';
 import { StudentsService } from './students.service';
 
@@ -6,4 +12,14 @@ import { StudentsService } from './students.service';
   controllers: [StudentsController],
   providers: [StudentsService],
 })
-export class StudentsModule {}
+export class StudentsModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(StudentsMiddleware)
+      .forRoutes({ path: '/students/:studentId', method: RequestMethod.GET });
+
+    consumer
+      .apply(StudentsMiddleware)
+      .forRoutes({ path: '/students/:studentId', method: RequestMethod.PUT });
+  }
+}
